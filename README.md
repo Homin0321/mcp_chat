@@ -12,11 +12,17 @@ MCP (Model Context Protocol) is an open-source standard for connecting AI applic
 
 ## How to Run
 
-1.  **Install dependencies**:
+1.  **Set up your environment**:
+    Create a `.env` file by copying the example file and editing it with your GEMINI_API_KEY value.
+    ```bash
+    cp .env.example .env
+    ```
+
+2.  **Install dependencies**:
     ```bash
     pip install -r requirements.txt
     ```
-2.  **Configure your MCP servers**:
+3.  **Configure your MCP servers**:
     Make sure you have a `mcp.json` file in the same directory with the following format:
     ```json
     {
