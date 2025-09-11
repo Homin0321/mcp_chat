@@ -29,16 +29,19 @@ def load_mcp_config():
 
 mcp_config = load_mcp_config()
 
-server_names = list(mcp_config['mcpServers'].keys())
+server_names = ["None"] + list(mcp_config['mcpServers'].keys())
 selected_server = st.sidebar.selectbox("Select a MCP server", server_names)
-server_config = mcp_config['mcpServers'][selected_server]
+server_config = {} if selected_server == "None" else mcp_config['mcpServers'][selected_server]
 
 # Create server parameters for stdio connection
-server_params = StdioServerParameters(
-    command=server_config['command'],
-    args=server_config['args'],
-    env=server_config.get('env'),
-)
+if server_config:
+    server_params = StdioServerParameters(
+        command=server_config['command'],
+        args=server_config['args'],
+        env=server_config.get('env'),
+    )
+else:
+    server_params = None
 
 # Server configuration details
 with st.sidebar.expander("⚙️ MCP Server Configuration"):
@@ -80,6 +83,16 @@ async def inspect_server(session):
             st.warning(f"list_tools not supported: {e}")
 
 async def send_prompt(prompt):
+    if not server_params:
+        response = await client.aio.models.generate_content(
+            model="gemini-2.5-flash-lite",
+            contents=prompt,
+        )
+        with st.chat_message("assistant"):
+            st.markdown(response.text)
+            st.session_state.messages.append({"role": "assistant", "content": response.text})
+        return
+
     async with stdio_client(server_params) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
@@ -92,11 +105,12 @@ async def send_prompt(prompt):
             )
             with st.chat_message("assistant"):
                 st.markdown(response.text)
-                # Add assistant response to chat history
                 st.session_state.messages.append({"role": "assistant", "content": response.text})
 
 # Session initialization and server inspection
 async def init_session():
+    if not server_params:
+        return
     async with stdio_client(server_params) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
