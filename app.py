@@ -13,7 +13,7 @@ import streamlit as st
 st.set_page_config(page_title="MCP Chat", page_icon="🤖", layout="wide")
 
 # Load environment variables and initialize client
-GEMINI_MODEL="gemini-2.5-flash-lite",
+GEMINI_MODEL = "gemini-2.5-flash-lite"
 @st.cache_resource
 def initialize_genai_client():
     """Initialize Gemini AI client."""
