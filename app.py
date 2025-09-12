@@ -254,6 +254,11 @@ def main():
         with st.spinner("Connecting to server..."):
             asyncio.run(initialize_session_safely(server_params))
         st.session_state.selected_server = selected_server
+        # Add assistant message to chat
+        st.session_state.chat['messages'].append({
+            'role': 'assistant',
+            'content': f"Connected to server: {st.session_state.get('selected_server', 'None')}"
+        })
     
     # Display chat history
     messages = st.session_state.chat['messages']
